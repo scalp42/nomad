@@ -5354,6 +5354,8 @@ func (s *Service) Copy() *Service {
 		ns.Checks = checks
 	}
 
+	ns.Connect = s.Connect.Copy()
+
 	return ns
 }
 
@@ -5416,6 +5418,12 @@ func (s *Service) Validate() error {
 		}
 	}
 
+	if s.Connect != nil {
+		if err := s.Connect.Validate(); err != nil {
+			mErr.Errors = append(mErr.Errors, err)
+		}
+	}
+
 	return mErr.ErrorOrNil()
 }
 
@@ -5461,6 +5469,7 @@ func (s *Service) Hash(allocID, taskName string, canary bool) string {
 	return b32.EncodeToString(h.Sum(nil))
 }
 
+// Equals returns true if the structs are recursively equal.
 func (s *Service) Equals(o *Service) bool {
 	if s == nil || o == nil {
 		return s == o
